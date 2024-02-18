@@ -16,6 +16,11 @@ sudo systemctl status smbd
 smbstatus --version
 ```
 
+Backup configuration file
+```
+sudo cp smb.conf smb.conf.backup
+```
+
 Samba configuration file
 ```
 sudo nano /etc/samba/smb.conf
