@@ -24,4 +24,4 @@ rm steps.md && \
 
 
 <br><br>
-*(steps used to configure <a https://github.com/vdarkobar/Samba/blob/main/steps.md">Samba</a>)*
+*(steps used to configure <a href="https://github.com/vdarkobar/Samba/blob/main/steps.md">Samba</a>)*
