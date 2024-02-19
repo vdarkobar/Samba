@@ -312,20 +312,20 @@ if ! sudo smbpasswd -e "${SMB_USER}"; then
     exit 1
 fi
 
-echo "Attempting to replace placeholder in /etc/samba/smb.conf with ${SMB_GROUP}"
+echo "Attempting to replace 'valid users = @SMB_GROUP_HERE' in /etc/samba/smb.conf with 'valid users = @${SMB_GROUP}'"
 
-# Modify /etc/samba/smb.conf
-if ! sudo sed -i "s/SMB_GROUP_HERE/${SMB_GROUP}/g" /etc/samba/smb.conf; then
-    echo "Error: Failed to execute sed command to update Samba configuration."
+# Modify /etc/samba/smb.conf to replace the specific line
+if ! sudo sed -i "/^valid users = @SMB_GROUP_HERE$/c\valid users = @${SMB_GROUP}" /etc/samba/smb.conf; then
+    echo "Error: Failed to replace 'valid users = @SMB_GROUP_HERE' with 'valid users = @${SMB_GROUP}'."
     exit 1
 fi
 
-# Check if the placeholder was replaced by attempting to find it post-replacement
-if grep -q "SMB_GROUP_HERE" /etc/samba/smb.conf; then
-    echo "Error: Placeholder 'SMB_GROUP_HERE' was not replaced. Please check your smb.conf file."
+# Verify the replacement
+if grep -q "valid users = @SMB_GROUP_HERE" /etc/samba/smb.conf; then
+    echo "Error: Placeholder 'valid users = @SMB_GROUP_HERE' was not replaced. Please manually check your smb.conf file."
     exit 1
 else
-    echo "Samba configuration successfully updated. Placeholder replaced with '${SMB_GROUP}'."
+    echo "Samba configuration successfully updated. 'valid users' set to '@${SMB_GROUP}'."
     echo "You may need to restart the Samba service (e.g., sudo service smbd restart)."
 fi
 
