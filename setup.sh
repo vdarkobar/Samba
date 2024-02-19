@@ -254,3 +254,147 @@ sudo ufw allow Samba && \
 sudo systemctl restart ufw
 
 
+######################################
+# Set User/Group/Folders/Premissions #
+######################################
+
+# Initialize variables
+SMB_GROUP=""
+SMB_USER=""
+
+# Get Samba group name with error correction
+while true; do
+    read -p "Enter the Samba group name: " SMB_GROUP
+    if [[ -n "${SMB_GROUP}" ]]; then  # Check if input is not empty
+        break
+    else
+        echo "Input cannot be empty. Please try again."
+    fi
+done
+
+# Get Samba user name with error correction
+while true; do
+    read -p "Enter the Samba user name: " SMB_USER
+    if [[ -n "${SMB_USER}" ]]; then  # Check if input is not empty
+        break
+    else
+        echo "Input cannot be empty. Please try again."
+    fi
+done
+
+# Create Samba group
+if ! sudo groupadd "${SMB_GROUP}"; then
+    echo "Error: Failed to create Samba group. Please check if the group already exists."
+    exit 1
+fi
+
+# Create Samba user
+if ! sudo useradd -M -s /sbin/nologin "${SMB_USER}"; then
+    echo "Error: Failed to create Samba user. Please check if the user already exists."
+    exit 1
+fi
+
+# Add user to group
+if ! sudo usermod -aG "${SMB_GROUP}" "${SMB_USER}"; then
+    echo "Error: Failed to add user to group."
+    exit 1
+fi
+
+# Add password to user
+if ! sudo smbpasswd -a "${SMB_USER}"; then
+    echo "Error: Failed to add password to user."
+    exit 1
+fi
+
+# Activate user
+if ! sudo smbpasswd -e "${SMB_USER}"; then
+    echo "Error: Failed to enable user."
+    exit 1
+fi
+
+# Modify /etc/samba/smb.conf
+if ! sudo sed -i "s/SMB_GROUP_HERE/${SMB_GROUP}/g" /etc/samba/smb.conf; then
+    echo "Error: Failed to update Samba configuration."
+    exit 1
+fi
+
+# Check if the placeholder was replaced 
+if grep -q "SMB_GROUP_HERE" /etc/samba/smb.conf; then
+    echo "Error: Placeholder was not replaced. Please check your smb.conf file."
+    exit 1
+else
+    echo "Samba configuration updated. You may need to restart the Samba service (e.g., sudo service smbd restart)."
+fi
+
+# Create directories
+if ! sudo mkdir -p /public || ! sudo mkdir -p /private; then
+    echo "Error: Failed to create directories."
+    exit 1
+fi
+
+# Set permissions
+if ! sudo chmod 2770 /private; then
+    echo "Error: Failed to set permissions on /private."
+    exit 1
+fi
+
+if ! sudo chmod 2775 /public; then
+    echo "Error: Failed to set permissions on /public."
+    exit 1
+fi
+
+# Change group ownership
+if ! sudo chgrp -R "${SMB_GROUP}" /private; then
+    echo "Error: Failed to change group ownership of /private."
+    exit 1
+fi
+
+if ! sudo chgrp -R "${SMB_GROUP}" /public; then
+    echo "Error: Failed to change group ownership of /public."
+    exit 1
+fi
+
+echo "Directories /public and /private are configured with the correct permissions and ownership."
+
+
+##############################
+# Replace configuration file #
+##############################
+echo -e "${GREEN}Replacing existing Unbound configuration file (unbound.conf) ${NC}"
+
+sleep 0.5 # delay for 0.5 seconds
+echo
+
+sudo cp smb.conf /etc/samba/smb.conf
+
+
+##########################
+# Info before reboot #
+##########################
+
+echo -e "${GREEN}REMEMBER: ${NC}"
+echo
+sleep 0.5 # delay for 0.5 seconds
+echo -e "${GREEN}Unbound will listen on all interfaces, access is limited to one Subnet:${NC} $LOCAL_SUBNET_ACCESS"
+echo -e "${GREEN}One Client Machine (${NC} $HOST_NAME_LOCAL ${GREEN}) is defined in Local Subnet Zone ${NC}"
+echo -e "${GREEN}Additional clients must be configured in:${NC} /etc/unboun/unboud.conf"
+echo
+echo -e "${GREEN}For queries that cannot be answered locally or from the cache, the Unbound server forwards these queries to upstream DNS servers, ${NC}"
+echo -e "${GREEN}using DNS-over-TLS (DoT) for encryption, enhancing privacy and security.  ${NC}"
+echo -e "${GREEN}It's configured to use reputable DoT providers such as Quad9 (I), Cloudflare (II), and optionally Google (must be enabled) ${NC}"
+
+echo
+
+##########################
+# Prompt user for reboot #
+##########################
+
+while true; do
+    read -p "Do you want to reboot the server now (recommended)? (yes/no): " response
+    case "${response,,}" in
+        yes|y) echo -e "${GREEN}Rebooting the server...${NC}"; sudo reboot; break ;;
+        no|n) echo -e "${RED}Reboot cancelled.${NC}"; exit 0 ;;
+        *) echo -e "${YELLOW}Invalid response. Please answer${NC} yes or no." ;;
+    esac
+done
+
