@@ -305,7 +305,7 @@ fi
 echo "Attempting to replace 'valid users = @SMB_GROUP_HERE' in /etc/samba/smb.conf with 'valid users = @${SMB_GROUP}'"
 
 # Modify /etc/samba/smb.conf to replace the specific line
-if ! sudo sed -i "s/valid users = @SMB_GROUP_HERE/valid users = @${SMB_GROUP}/" /etc/samba/smb.conf; then
+if ! sudo -E sh -c "sed -i 's/valid users = @SMB_GROUP_HERE/valid users = @${SMB_GROUP}/' /etc/samba/smb.conf"; then
     echo "Error: Failed to replace 'valid users = @SMB_GROUP_HERE' with 'valid users = @${SMB_GROUP}'."
     exit 1
 fi
