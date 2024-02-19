@@ -32,7 +32,7 @@ echo
 # Prompt user to confirm script start#
 ######################################
 while true; do
-    echo -e "${GREEN}Start Unbound installation and configuration? (y/n) ${NC}"
+    echo -e "${GREEN}Start Samba installation and configuration? (y/n) ${NC}"
     read choice
 
     # Check if user entered "y" or "Y"
