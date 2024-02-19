@@ -259,18 +259,8 @@ sudo systemctl restart ufw
 ######################################
 
 # Initialize variables
-SMB_GROUP=""
+SMB_GROUP="privatesharegroup"  # Hardcoded group name
 SMB_USER=""
-
-# Get Samba group name with error correction
-while true; do
-    read -p "Enter the Samba group name: " SMB_GROUP
-    if [[ -n "${SMB_GROUP}" ]]; then  # Check if input is not empty
-        break
-    else
-        echo "Input cannot be empty. Please try again."
-    fi
-done
 
 # Get Samba user name with error correction
 while true; do
@@ -299,27 +289,6 @@ if ! sudo usermod -aG "${SMB_GROUP}" "${SMB_USER}"; then
     echo "Error: Failed to add user to group."
     exit 1
 fi
-
-#####################
-
-echo "Attempting to replace 'valid users = @SMB_GROUP_HERE' in /etc/samba/smb.conf with 'valid users = @${SMB_GROUP}'"
-
-# Modify /etc/samba/smb.conf to replace the specific line
-if ! sudo -E sh -c "sed -i 's/valid users = @SMB_GROUP_HERE/valid users = @${SMB_GROUP}/' /etc/samba/smb.conf"; then
-    echo "Error: Failed to replace 'valid users = @SMB_GROUP_HERE' with 'valid users = @${SMB_GROUP}'."
-    exit 1
-fi
-
-# Verify the replacement
-if grep -q "valid users = @SMB_GROUP_HERE" /etc/samba/smb.conf; then
-    echo "Error: Placeholder 'valid users = @SMB_GROUP_HERE' was not replaced. Please manually check your smb.conf file."
-    exit 1
-else
-    echo "Samba configuration successfully updated. 'valid users' set to '@${SMB_GROUP}'."
-    echo "You may need to restart the Samba service (e.g., sudo service smbd restart)."
-fi
-
-#############################
 
 # Create directories
 if ! sudo mkdir -p /public || ! sudo mkdir -p /private; then
@@ -362,7 +331,6 @@ if ! sudo smbpasswd -e "${SMB_USER}"; then
     echo "Error: Failed to enable user."
     exit 1
 fi
-
 
 ##############################
 # Replace configuration file #
