@@ -40,18 +40,12 @@ sudo groupadd smbshare
 
 Add the necessary group permissions for the private share.
 ```
-sudo chgrp -R smbshare /private
-```
-```
-sudo chgrp -R smbshare /public
+sudo chgrp -R smbshare ~/private && sudo chgrp -R smbshare ~/public
 ```
 
 Set the right directory permissions.
 ```
-sudo chmod 2770 /private
-```
-```
-sudo chmod 2775 /public
+sudo chmod 2770 ~/private && sudo chmod 2775 ~/public
 ```
 
 Create a no login local user to access the private share.
