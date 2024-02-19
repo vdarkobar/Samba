@@ -300,18 +300,6 @@ if ! sudo usermod -aG "${SMB_GROUP}" "${SMB_USER}"; then
     exit 1
 fi
 
-# Add password to user
-if ! sudo smbpasswd -a "${SMB_USER}"; then
-    echo "Error: Failed to add password to user."
-    exit 1
-fi
-
-# Activate user
-if ! sudo smbpasswd -e "${SMB_USER}"; then
-    echo "Error: Failed to enable user."
-    exit 1
-fi
-
 #####################
 
 echo "Attempting to replace 'valid users = @SMB_GROUP_HERE' in /etc/samba/smb.conf with 'valid users = @${SMB_GROUP}'"
@@ -362,6 +350,18 @@ if ! sudo chgrp -R "${SMB_GROUP}" /public; then
 fi
 
 echo "Directories /public and /private are configured with the correct permissions and ownership."
+
+# Add password to user
+if ! sudo smbpasswd -a "${SMB_USER}"; then
+    echo "Error: Failed to add password to user."
+    exit 1
+fi
+
+# Activate user
+if ! sudo smbpasswd -e "${SMB_USER}"; then
+    echo "Error: Failed to enable user."
+    exit 1
+fi
 
 
 ##############################
