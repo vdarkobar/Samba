@@ -28,10 +28,9 @@ sudo nano /etc/samba/smb.conf
 
 Create Shared Samba Directories
 ```
-sudo mkdir /public
+Create Shared Samba Directories (current user home folder)
 ```
-```
-sudo mkdir /private
+sudo mkdir ~/public && sudo mkdir ~/private
 ```
 
 Samba share user group
