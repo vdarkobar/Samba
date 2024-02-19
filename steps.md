@@ -18,7 +18,7 @@ smbstatus --version
 
 Backup configuration file
 ```
-sudo cp smb.conf smb.conf.backup
+sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.backup
 ```
 
 Samba configuration file
