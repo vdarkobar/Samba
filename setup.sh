@@ -312,13 +312,17 @@ if ! sudo smbpasswd -e "${SMB_USER}"; then
     exit 1
 fi
 
-echo "Attempting to replace 'valid users = @SMB_GROUP_HERE' in /etc/samba/smb.conf with 'valid users = @${SMB_GROUP}'"
+# Assuming SMB_GROUP is set correctly
+echo "@${SMB_GROUP}" > /tmp/smb_group_temp.txt
 
-# Modify /etc/samba/smb.conf to replace the specific line
-if ! sudo sed -i "/^valid users = @SMB_GROUP_HERE$/c\valid users = @${SMB_GROUP}" /etc/samba/smb.conf; then
+# Modify /etc/samba/smb.conf to replace the specific line, using the temporary file
+if ! sudo sed -i "/^valid users = @SMB_GROUP_HERE$/c\valid users = $(cat /tmp/smb_group_temp.txt)" /etc/samba/smb.conf; then
     echo "Error: Failed to replace 'valid users = @SMB_GROUP_HERE' with 'valid users = @${SMB_GROUP}'."
     exit 1
 fi
+
+# Clean up the temporary file
+rm /tmp/smb_group_temp.txt
 
 # Verify the replacement
 if grep -q "valid users = @SMB_GROUP_HERE" /etc/samba/smb.conf; then
