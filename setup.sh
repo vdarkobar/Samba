@@ -312,18 +312,21 @@ if ! sudo smbpasswd -e "${SMB_USER}"; then
     exit 1
 fi
 
+echo "Attempting to replace placeholder in /etc/samba/smb.conf with ${SMB_GROUP}"
+
 # Modify /etc/samba/smb.conf
 if ! sudo sed -i "s/SMB_GROUP_HERE/${SMB_GROUP}/g" /etc/samba/smb.conf; then
-    echo "Error: Failed to update Samba configuration."
+    echo "Error: Failed to execute sed command to update Samba configuration."
     exit 1
 fi
 
-# Check if the placeholder was replaced 
+# Check if the placeholder was replaced by attempting to find it post-replacement
 if grep -q "SMB_GROUP_HERE" /etc/samba/smb.conf; then
-    echo "Error: Placeholder was not replaced. Please check your smb.conf file."
+    echo "Error: Placeholder 'SMB_GROUP_HERE' was not replaced. Please check your smb.conf file."
     exit 1
 else
-    echo "Samba configuration updated. You may need to restart the Samba service (e.g., sudo service smbd restart)."
+    echo "Samba configuration successfully updated. Placeholder replaced with '${SMB_GROUP}'."
+    echo "You may need to restart the Samba service (e.g., sudo service smbd restart)."
 fi
 
 # Create directories
