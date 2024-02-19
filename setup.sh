@@ -375,14 +375,11 @@ sudo cp smb.conf /etc/samba/smb.conf
 echo -e "${GREEN}REMEMBER: ${NC}"
 echo
 sleep 0.5 # delay for 0.5 seconds
-echo -e "${GREEN}Unbound will listen on all interfaces, access is limited to one Subnet:${NC} $LOCAL_SUBNET_ACCESS"
-echo -e "${GREEN}One Client Machine (${NC} $HOST_NAME_LOCAL ${GREEN}) is defined in Local Subnet Zone ${NC}"
-echo -e "${GREEN}Additional clients must be configured in:${NC} /etc/unboun/unboud.conf"
+echo -e "${GREEN} ... ${NC}"
+echo -e "${GREEN} ... ${NC}"
 echo
-echo -e "${GREEN}For queries that cannot be answered locally or from the cache, the Unbound server forwards these queries to upstream DNS servers, ${NC}"
-echo -e "${GREEN}using DNS-over-TLS (DoT) for encryption, enhancing privacy and security.  ${NC}"
-echo -e "${GREEN}It's configured to use reputable DoT providers such as Quad9 (I), Cloudflare (II), and optionally Google (must be enabled) ${NC}"
-
+echo -e "${GREEN} ... ${NC}"
+echo -e "${GREEN} ... ${NC}"
 echo
 
 ##########################
