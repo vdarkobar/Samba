@@ -26,9 +26,9 @@ Samba configuration file
 sudo nano /etc/samba/smb.conf
 ```
 
-Create Shared Samba Directories (current user home folder)
+Create Shared Samba Directories
 ```
-sudo mkdir ~/public && sudo mkdir ~/private
+sudo mkdir /public && sudo mkdir /private
 ```
 
 Create Samba share user group
@@ -38,15 +38,16 @@ sudo groupadd smbshare
 
 Add the necessary group permissions for the private share.
 ```
-sudo chgrp -R smbshare ~/private && sudo chgrp -R smbshare ~/public
+sudo chgrp -R smbshare /private && sudo chgrp -R smbshare /public   # root:smbshare
+# sudo chown -R username:group directory
 ```
 
 Set the right directory permissions.
 ```
-sudo chmod 2770 ~/private && sudo chmod 2775 ~/public
+sudo chmod 2770 /private && sudo chmod 2775 /public
 ```
 
-Create a no login local user to access the private share.
+Create a no login local user to access the private share
 ```
 sudo useradd -M -s /sbin/nologin sambauser
 ```
@@ -66,6 +67,14 @@ Enable the created account:
 sudo smbpasswd -e sambauser
 ```
 
+List all users in a group
+```
+grep '^group_name_here:' /etc/group
+```
+```
+getent group group_name_here
+```
+
 Verify the Samba configuration
 ```
 sudo testparm
@@ -73,7 +82,7 @@ sudo testparm
 
 Restart the Samba service
 ```
-sudo systemctl restart smbd
+sudo systemctl restart smbd nmbd
 ```
 
 Allow Samba traffic (Ports: 137,138/udp, 139,445/tcp)
@@ -94,11 +103,21 @@ Create demo files in the Samba shares, try accessing the share from your local m
 sudo mkdir /private/demo-private /public/demo-public && \
 sudo touch /private/demo1.txt /public/demo2.txt
 ```
+
+Test access to the share locally
 ```
 smbclient '\\localhost\private' -U sambauser
 ```
 ```
-ls
+l #ls
+```
+```
+smbclient '\\localhost\public'
+```
+
+List what services are available on a Samba server
+```
+smbclient -L //server-ip/ -U sambauser
 ```
 
 To set up a Linux client, you will need Samba packages:
@@ -108,5 +127,9 @@ sudo apt install samba-client cifs-utils
 
 Once installed, navigate to File manager->Other locations and add your share using the syntax below.
 ```
-smb://servername/Share_name
+smb://servername/share_name
 ```
+
+
+
+
