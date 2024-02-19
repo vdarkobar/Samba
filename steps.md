@@ -26,14 +26,12 @@ Samba configuration file
 sudo nano /etc/samba/smb.conf
 ```
 
-Create Shared Samba Directories
-```
 Create Shared Samba Directories (current user home folder)
 ```
 sudo mkdir ~/public && sudo mkdir ~/private
 ```
 
-Samba share user group
+Create Samba share user group
 ```
 sudo groupadd smbshare
 ```
