@@ -9,6 +9,7 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[0;33m'
 
+
 ########################################################
 # Define ANSI escape sequence to reset font to default #
 ########################################################
@@ -29,6 +30,7 @@ echo -e "${GREEN} - One Samba User name and one Samba Group, to determin ownersh
 echo
 echo -e "${GREEN} - Additional Users and/or Groups or Share Definitions can be added later, on the Server. ${NC}"
 echo
+
 
 #######################################
 # Prompt user to confirm script start #
@@ -256,6 +258,7 @@ sudo ufw allow Samba && \
 sudo systemctl restart ufw
 echo
 
+
 ######################################
 # Set User/Group/Folders/Premissions #
 ######################################
@@ -362,7 +365,7 @@ if ! sudo chgrp -R "${SMB_GROUP}" /public; then
 fi
 
 echo
-echo -e "${GREEN}Directories${NC} /public ${GREEN}and /private ${GREEN}are configured with the correct ownership.${NC}"
+echo -e "${GREEN}Directories${NC} /public ${GREEN}and${NC} /private ${GREEN}are configured with the correct ownership.${NC}"
 echo
 
 # Add user to group
@@ -395,10 +398,11 @@ if grep -q "SMB_GROUP_HERE" smb.conf; then
     echo -e "${RED}Error: Placeholder was not replaced. Please check your smb.conf file. ${NC}"
     exit 1
 else
-    echo -e "${GREEN}Samba configuration updated. You may need to restart the Samba service (e.g., sudo service smbd restart).${NC}"
+    echo -e "${GREEN}Samba configuration updated. You may need to restart the Samba service. ${NC}"
 fi
 
 echo
+
 
 ##############################
 # Replace configuration file #
@@ -420,20 +424,18 @@ fi
 ######################
 
 echo -e "${GREEN}REMEMBER: ${NC}"
-echo
 sleep 0.5 # delay for 0.5 seconds
 echo
 
 echo -e "${GREEN}This configuration creates two shared folders: ${NC}"
 echo -e 
 echo -e "/public - ${GREEN}for Limited Guest Access (Read only) ${NC}"
-echo -e "/private - ${GREEN}owned by Samba group: $SMB_GROUP ${GREEN}with the following member: ${NC} $SMB_USER"
+echo -e "/private - ${GREEN}owned by Samba group:${NC} $SMB_GROUP ${GREEN}with the following member:${NC} $SMB_USER"
 echo
-echo -e "${GREEN}Username to access private Samba share: ${NC} $SMB_USER"
+echo -e "${GREEN}Username to access private Samba share:${NC} $SMB_USER"
 echo
-echo -e "${GREEN}To list what services are available on a Samba server ${NC}"
+echo -e "${GREEN}To list what Samba services are available on the server:${NC}"
 echo -e "smbclient -L //$IP_ADDRESS/ -U $SMB_USER"
-echo
 echo
 echo -e "${GREEN}Test access to the share at: ${NC}"
 echo
