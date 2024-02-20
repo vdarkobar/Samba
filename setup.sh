@@ -25,8 +25,9 @@ sleep 0.5 # delay for 0.5 seconds
 echo
 
 echo -e "${GREEN} - You'll be asked to enter: ${NC}"
-echo -e "${GREEN} - Samba Username and Samba Group, ${NC}"
-echo -e "${GREEN} - to determin ownership for the Shares. ${NC}"
+echo -e "${GREEN} - OneSamba User name and Samba Group, ${NC}"
+echo -e "${GREEN} - to determin ownership for the shares. ${NC}"
+echo -e "${GREEN} - Additional Users and/or Groups or Share Definitions can be added later, on the Server. ${NC}"
 echo
 
 ######################################
@@ -66,7 +67,7 @@ sleep 0.5 # delay for 0.5 seconds
 echo
 
 if ! sudo apt install -y samba smbclient cifs-utils; then
-    echo "Failed to install packages. Exiting."
+    echo -e "${RED}Failed to install packages. Exiting. ${NC}"
     exit 1
 fi
 
@@ -246,41 +247,37 @@ echo -e "${GREEN}Modifications completed successfully. ${NC}"
 # Prepare firewall #
 ####################
 echo
-echo -e "${GREEN} Preparing firewall ${NC}"
+echo -e "${GREEN}Preparing firewall ${NC}"
 
 sleep 0.5 # delay for 0.5 seconds
 echo
 
 sudo ufw allow Samba && \
 sudo systemctl restart ufw
-
+echo
 
 ######################################
 # Set User/Group/Folders/Premissions #
 ######################################
 
-# Initialize variables
-#SMB_GROUP=""
-#SMB_USER=""
-
 # Create directories
 if ! sudo mkdir -p /public || ! sudo mkdir -p /private; then
-    echo "Error: Failed to create directories."
+    echo -e "${RED}Error: Failed to create directories. ${NC}"
     exit 1
 fi
 
 # Set permissions
 if ! sudo chmod 2770 /private; then
-    echo "Error: Failed to set permissions on /private."
+    echo -e "${RED}Error: Failed to set permissions on${NC} /private"
     exit 1
 fi
 
 if ! sudo chmod 2775 /public; then
-    echo "Error: Failed to set permissions on /public."
+    echo -e "${RED}Error: Failed to set permissions on${NC} /public"
     exit 1
 fi
 
-echo "Directories /public and /private are configured with the correct permissions"
+echo -e "${GREEN}Directories${NC} /public ${GREEN}and${NC} /private${NC} ${GREEN}are configured with the correct permissions${NC}"
 
 # Get valid Samba user name with error correction, existing user check, and repetition
 while true; do
@@ -288,15 +285,15 @@ while true; do
 
     # Input validation
     if [[ -z "${SMB_USER}" ]]; then  # Check if input is empty
-        echo "Input cannot be empty. Please try again."
+        echo -e "${YELLOW}Input cannot be empty. Please try again. ${NC}"
     elif [[ ! "${SMB_USER}" =~ ^[a-zA-Z0-9]+$ ]]; then # Basic sanitization
-        echo "Group name can only contain letters, numbers. Please try again."
+        echo -e "${YELLOW}Group name can only contain letters, numbers. Please try again. ${NC}"
     else
         # Get existing user names for validation
         existing_users=$(sudo getent group | awk -F: '{print $1}' | paste -sd, -)
 
         if [[ ",$existing_users," =~ ",$SMB_USER," ]]; then  # Check against existing users
-            echo "User name already exists. Please choose a different name."
+            echo -e "${YELLOW}User name already exists. Please choose a different name.${NC}"
         else
             # User name is valid, proceed with the rest of your actions
             echo "$SMB_USER" > "smb-user-name.txt" 
@@ -307,19 +304,19 @@ done
 
 # Create Samba user
 if ! sudo useradd -M -s /sbin/nologin "${SMB_USER}"; then
-    echo "Error: Failed to create Samba user. Please check if the user already exists."
+    echo -e "${RED}Error: Failed to create Samba user. Please check if the user already exists. ${NC}"
     exit 1
 fi
 
 # Add password to user
 if ! sudo smbpasswd -a "${SMB_USER}"; then
-    echo "Error: Failed to add password to user."
+    echo -e "${RED}Error: Failed to add password to user. ${NC}"
     exit 1
 fi
 
 # Activate user
 if ! sudo smbpasswd -e "${SMB_USER}"; then
-    echo "Error: Failed to enable user."
+    echo -e "${RED}Error: Failed to enable user. ${NC}"
     exit 1
 fi
 
@@ -329,15 +326,15 @@ while true; do
 
     # Input validation
     if [[ -z "${SMB_GROUP}" ]]; then  # Check if input is empty
-        echo "Input cannot be empty. Please try again."
+        echo -e "${YELLOW}Input cannot be empty. Please try again.${NC}"
     elif [[ ! "${SMB_GROUP}" =~ ^[a-zA-Z0-9]+$ ]]; then # Basic sanitization
-        echo "Group name can only contain letters, numbers, underscores, and hyphens. Please try again."
+        echo -e "${YELLOW}Group name can only contain letters, numbers, underscores, and hyphens. Please try again.${NC}"
     else
         # Get existing group names for validation
         existing_groups=$(sudo getent group | awk -F: '{print $1}' | paste -sd, -)
 
         if [[ ",$existing_groups," =~ ",$SMB_GROUP," ]]; then  # Check against existing groups
-            echo "Group name already exists. Please choose a different name."
+            echo -e "${YELLOW}Group name already exists. Please choose a different name.${NC}"
         else
             # Group name is valid, proceed with the rest of your actions
             echo "$SMB_GROUP" > "smb-group-name.txt" 
@@ -348,26 +345,26 @@ done
 
 # Create Samba group
 if ! sudo groupadd "${SMB_GROUP}"; then
-    echo "Error: Failed to create Samba group. Please check if the group already exists."
+    echo -e "${RED}Error: Failed to create Samba group. Please check if the group already exists. ${NC}"
     exit 1
 fi
 
 # Change group ownership
 if ! sudo chgrp -R "${SMB_GROUP}" /private; then
-    echo "Error: Failed to change group ownership of /private."
+    echo -e "${RED}Error: Failed to change group ownership of${NC} /private"
     exit 1
 fi
 
 if ! sudo chgrp -R "${SMB_GROUP}" /public; then
-    echo "Error: Failed to change group ownership of /public."
+    echo -e "${RED}Error: Failed to change group ownership of${NC} /public "
     exit 1
 fi
 
-echo "Directories /public and /private are configured with the correct ownership."
+echo -e "${GREEN}Directories${NC} /public ${GREEN}and /private ${GREEN}are configured with the correct ownership.${NC}"
 
 # Add user to group
 if ! sudo usermod -aG "${SMB_GROUP}" "${SMB_USER}"; then
-    echo "Error: Failed to add user to group."
+    echo -e "${RED}Error: Failed to add user to group. ${NC}"
     exit 1
 fi
 
@@ -379,23 +376,23 @@ if ! sudo sed -i "s:SMB_GROUP_HERE:$SMB_GROUP:g" smb.conf; then
 
         # Attempt replacement with group name from the file
         if sudo sed -i "s:SMB_GROUP_HERE:$fallback_group:g" smb.conf; then
-            echo "Placeholder replaced with group name from smb-group-name.txt"
+            echo -e "${YELLOW}Placeholder replaced with group name extracted from${NC} smb-group-name.txt"
         else
-            echo "Error: Failed to update Samba configuration even with fallback."
+            echo -e "${RED}Error: Failed to update Samba configuration even with fallback. ${NC}"
             exit 1
         fi
     else
-        echo "Error: Failed to update Samba configuration and smb-group-name.txt not found."
+        echo -e "${RED}Error: Failed to update Samba configuration and smb-group-name.txt not found. ${NC}"
         exit 1
     fi
 fi
 
 # Check if the placeholder was replaced even after potential fallback
 if grep -q "SMB_GROUP_HERE" smb.conf; then
-    echo "Error: Placeholder was not replaced. Please check your smb.conf file."
+    echo -e "${RED}Error: Placeholder was not replaced. Please check your smb.conf file. ${NC}"
     exit 1
 else
-    echo "Samba configuration updated. You may need to restart the Samba service (e.g., sudo service smbd restart)."
+    echo -e "${GREEN}Samba configuration updated. You may need to restart the Samba service (e.g., sudo service smbd restart).${NC}"
 fi
 
 
@@ -409,7 +406,7 @@ echo
 
 sudo cp smb.conf /etc/samba/smb.conf
 if [ $? -ne 0 ]; then
-    echo "Error: Failed to copy smb.conf to /etc/samba/smb.conf"
+    echo -e "${RED}Error: Failed to copy${NC} smb.conf ${RED}to${NC} /etc/samba/smb.conf"
     exit 1
 fi
 
@@ -423,21 +420,21 @@ echo
 sleep 0.5 # delay for 0.5 seconds
 echo
 
-echo -e "This configuration creates two shared folders:"
+echo -e "${GREEN}This configuration creates two shared folders: ${NC}"
 echo -e 
-echo -e "/public - for Limited Guest Access (Read only)"
-echo -e "/private - owned by Samba group: $SMB_GROUP with the following member: $SMB_USER"
+echo -e "/public - ${GREEN}for Limited Guest Access (Read only) ${NC}"
+echo -e "/private - ${GREEN}owned by Samba group: $SMB_GROUP ${GREEN}with the following member: ${NC} $SMB_USER"
 echo
-echo -e "Username to access private Samba share: $SMB_USER"
+echo -e "${GREEN}Username to access private Samba share: ${NC} $SMB_USER"
 echo
-echo -e "To list what services are available on a Samba server"
+echo -e "${GREEN}To list what services are available on a Samba server ${NC}"
 echo
 echo -e "smbclient -L //$IP_ADDRESS/ -U $SMB_USER"
 echo
 echo
-echo -e "Test access to the share at:"
+echo -e "${GREEN}Test access to the share at: ${NC}"
 echo
-echo -e "Linux:"
+echo -e "${GREEN}Linux: ${NC}"
 echo -e "smbclient '\\localhost\private' -U $SMB_USER"
 echo -e "smbclient '\\localhost\public' -U $SMB_USER"
 echo -e "smbclient '\\$IP_ADDRESS\private' -U $SMB_USER"
@@ -445,7 +442,7 @@ echo -e "smbclient '\\$IP_ADDRESS\public' -U $SMB_USER"
 echo -e "smbclient '\\$HOST_NAME.$DOMAIN_NAME\private' -U $SMB_USER"
 echo -e "smbclient '\\$HOST_NAME.$DOMAIN_NAME\public' -U $SMB_USER"
 echo
-echo -e "on Windows:"
+echo -e "${GREEN}on Windows: ${NC}"
 echo -e "\\$IP_ADDRESS"
 echo -e "\\$HOST_NAME.$DOMAIN_NAME"
 echo
