@@ -25,7 +25,8 @@ sleep 0.5 # delay for 0.5 seconds
 echo
 
 echo -e "${GREEN} - You'll be asked to enter: ${NC}"
-echo -e "${GREEN} - ... ${NC}"
+echo -e "${GREEN} - Samba User name and Samba Group, ${NC}"
+echo -e "${GREEN} - to determin ownership for the shares. ${NC}"
 echo
 
 ######################################
@@ -420,12 +421,35 @@ fi
 echo -e "${GREEN}REMEMBER: ${NC}"
 echo
 sleep 0.5 # delay for 0.5 seconds
-echo -e "${GREEN} ... ${NC}"
-echo -e "${GREEN} ... ${NC}"
 echo
-echo -e "${GREEN} ... ${NC}"
-echo -e "${GREEN} ... ${NC}"
+
+echo -e "This configuration creates two shared folders:"
+echo -e 
+echo -e "/public - for Limited Guest Access (Read only)"
+echo -e "/private - owned by Samba group: $SMB_GROUP with the following member: $SMB_USER"
 echo
+echo -e "Username to access private Samba share: $SMB_USER"
+echo
+echo -e "To list what services are available on a Samba server"
+echo
+echo -e "smbclient -L //$IP_ADDRESS/ -U $SMB_USER"
+echo
+echo
+echo -e "Test access to the share at:"
+echo
+echo -e "Linux:"
+echo -e "smbclient '\\localhost\private' -U $SMB_USER"
+echo -e "smbclient '\\localhost\public' -U $SMB_USER"
+echo -e "smbclient '\\$IP_ADDRESS\private' -U $SMB_USER"
+echo -e "smbclient '\\$IP_ADDRESS\public' -U $SMB_USER"
+echo -e "smbclient '\\$HOST_NAME.$DOMAIN_NAME\private' -U $SMB_USER"
+echo -e "smbclient '\\$HOST_NAME.$DOMAIN_NAME\public' -U $SMB_USER"
+echo
+echo -e "on Windows:"
+echo -e "\\$IP_ADDRESS"
+echo -e "\\$HOST_NAME.$DOMAIN_NAME"
+echo
+
 
 ##########################
 # Prompt user for reboot #
