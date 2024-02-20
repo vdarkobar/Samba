@@ -25,14 +25,14 @@ sleep 0.5 # delay for 0.5 seconds
 echo
 
 echo -e "${GREEN} - You'll be asked to enter: ${NC}"
-echo -e "${GREEN} - OneSamba User name and Samba Group, ${NC}"
-echo -e "${GREEN} - to determin ownership for the shares. ${NC}"
+echo -e "${GREEN} - One Samba User name and one Samba Group, to determin ownership for the shares. ${NC}"
+echo
 echo -e "${GREEN} - Additional Users and/or Groups or Share Definitions can be added later, on the Server. ${NC}"
 echo
 
-######################################
-# Prompt user to confirm script start#
-######################################
+#######################################
+# Prompt user to confirm script start #
+#######################################
 while true; do
     echo -e "${GREEN}Start Samba installation and configuration? (y/n) ${NC}"
     read choice
@@ -58,9 +58,9 @@ while true; do
 done
 
 
-###################
+#################
 # Install Samba #
-###################
+#################
 echo -e "${GREEN} Installing Samba and other packages ${NC}"
 
 sleep 0.5 # delay for 0.5 seconds
@@ -278,6 +278,7 @@ if ! sudo chmod 2775 /public; then
 fi
 
 echo -e "${GREEN}Directories${NC} /public ${GREEN}and${NC} /private${NC} ${GREEN}are configured with the correct permissions${NC}"
+echo
 
 # Get valid Samba user name with error correction, existing user check, and repetition
 while true; do
@@ -360,7 +361,9 @@ if ! sudo chgrp -R "${SMB_GROUP}" /public; then
     exit 1
 fi
 
+echo
 echo -e "${GREEN}Directories${NC} /public ${GREEN}and /private ${GREEN}are configured with the correct ownership.${NC}"
+echo
 
 # Add user to group
 if ! sudo usermod -aG "${SMB_GROUP}" "${SMB_USER}"; then
@@ -395,11 +398,12 @@ else
     echo -e "${GREEN}Samba configuration updated. You may need to restart the Samba service (e.g., sudo service smbd restart).${NC}"
 fi
 
+echo
 
 ##############################
 # Replace configuration file #
 ##############################
-echo -e "${GREEN}Replacing existing Unbound configuration file (unbound.conf) ${NC}"
+echo -e "${GREEN}Replacing existing Samba configuration file ${NC} (smb.conf)"
 
 sleep 0.5 # delay for 0.5 seconds
 echo
@@ -411,9 +415,9 @@ if [ $? -ne 0 ]; then
 fi
 
 
-##########################
+######################
 # Info before reboot #
-##########################
+######################
 
 echo -e "${GREEN}REMEMBER: ${NC}"
 echo
@@ -428,7 +432,6 @@ echo
 echo -e "${GREEN}Username to access private Samba share: ${NC} $SMB_USER"
 echo
 echo -e "${GREEN}To list what services are available on a Samba server ${NC}"
-echo
 echo -e "smbclient -L //$IP_ADDRESS/ -U $SMB_USER"
 echo
 echo
