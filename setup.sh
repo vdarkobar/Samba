@@ -317,7 +317,7 @@ fi
 
 
 # Modify /etc/samba/smb.conf
-if ! sudo sed -i sudo sed -i "s:SMB_GROUP_HERE:$SMB_GROUP:g" /etc/samba/smb.conf; then
+if ! sudo sed -i "s:SMB_GROUP_HERE:$SMB_GROUP:g" /etc/samba/smb.conf; then
     echo "Error: Failed to update Samba configuration."
     exit 1
 fi
