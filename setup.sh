@@ -407,6 +407,10 @@ sleep 0.5 # delay for 0.5 seconds
 echo
 
 sudo cp smb.conf /etc/samba/smb.conf
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to copy smb.conf to /etc/samba/smb.conf"
+    exit 1
+fi
 
 
 ##########################
