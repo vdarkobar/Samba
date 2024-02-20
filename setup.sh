@@ -254,13 +254,23 @@ sudo ufw allow Samba && \
 sudo systemctl restart ufw
 
 
-################################
-# Set User/Folders/Premissions #
-################################
+######################################
+# Set User/Group/Folders/Premissions #
+######################################
 
 # Initialize variables
-SMB_GROUP="privatesharegroup"  # Hardcoded group name
+SMB_GROUP=""
 SMB_USER=""
+
+# Get Samba group name with error correction
+while true; do
+    read -p "Enter the Samba group name: " SMB_GROUP
+    if [[ -n "${SMB_GROUP}" ]]; then  # Check if input is not empty
+        break
+    else
+        echo "Input cannot be empty. Please try again."
+    fi
+done
 
 # Get Samba user name with error correction
 while true; do
@@ -288,6 +298,36 @@ fi
 if ! sudo usermod -aG "${SMB_GROUP}" "${SMB_USER}"; then
     echo "Error: Failed to add user to group."
     exit 1
+fi
+
+# Add password to user
+if ! sudo smbpasswd -a "${SMB_USER}"; then
+    echo "Error: Failed to add password to user."
+    exit 1
+fi
+
+# Activate user
+if ! sudo smbpasswd -e "${SMB_USER}"; then
+    echo "Error: Failed to enable user."
+    exit 1
+fi
+
+
+                                    # sudo sed -i "s:SMB_GROUP_HERE:$SMB_GROUP:g" /etc/samba/smb.conf
+
+
+# Modify /etc/samba/smb.conf
+if ! sudo sed -i sudo sed -i "s:SMB_GROUP_HERE:$SMB_GROUP:g" /etc/samba/smb.conf; then
+    echo "Error: Failed to update Samba configuration."
+    exit 1
+fi
+
+# Check if the placeholder was replaced 
+if grep -q "SMB_GROUP_HERE" /etc/samba/smb.conf; then
+    echo "Error: Placeholder was not replaced. Please check your smb.conf file."
+    exit 1
+else
+    echo "Samba configuration updated. You may need to restart the Samba service (e.g., sudo service smbd restart)."
 fi
 
 # Create directories
@@ -320,17 +360,6 @@ fi
 
 echo "Directories /public and /private are configured with the correct permissions and ownership."
 
-# Add password to user
-if ! sudo smbpasswd -a "${SMB_USER}"; then
-    echo "Error: Failed to add password to user."
-    exit 1
-fi
-
-# Activate user
-if ! sudo smbpasswd -e "${SMB_USER}"; then
-    echo "Error: Failed to enable user."
-    exit 1
-fi
 
 ##############################
 # Replace configuration file #
@@ -369,4 +398,3 @@ while true; do
         *) echo -e "${YELLOW}Invalid response. Please answer${NC} yes or no." ;;
     esac
 done
-
