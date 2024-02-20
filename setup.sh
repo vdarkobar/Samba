@@ -25,8 +25,8 @@ sleep 0.5 # delay for 0.5 seconds
 echo
 
 echo -e "${GREEN} - You'll be asked to enter: ${NC}"
-echo -e "${GREEN} - Samba User name and Samba Group, ${NC}"
-echo -e "${GREEN} - to determin ownership for the shares. ${NC}"
+echo -e "${GREEN} - Samba Username and Samba Group, ${NC}"
+echo -e "${GREEN} - to determin ownership for the Shares. ${NC}"
 echo
 
 ######################################
