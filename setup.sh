@@ -254,9 +254,9 @@ sudo ufw allow Samba && \
 sudo systemctl restart ufw
 
 
-######################################
-# Set User/Group/Folders/Premissions #
-######################################
+################################
+# Set User/Folders/Premissions #
+################################
 
 # Initialize variables
 SMB_GROUP="privatesharegroup"  # Hardcoded group name
