@@ -259,76 +259,8 @@ sudo systemctl restart ufw
 ######################################
 
 # Initialize variables
-SMB_GROUP=""
-SMB_USER=""
-
-# Get Samba group name with error correction
-while true; do
-    read -p "Enter the Samba group name: " SMB_GROUP
-    if [[ -n "${SMB_GROUP}" ]]; then  # Check if input is not empty
-        break
-    else
-        echo "Input cannot be empty. Please try again."
-    fi
-done
-
-# Get Samba user name with error correction
-while true; do
-    read -p "Enter the Samba user name: " SMB_USER
-    if [[ -n "${SMB_USER}" ]]; then  # Check if input is not empty
-        break
-    else
-        echo "Input cannot be empty. Please try again."
-    fi
-done
-
-# Create Samba group
-if ! sudo groupadd "${SMB_GROUP}"; then
-    echo "Error: Failed to create Samba group. Please check if the group already exists."
-    exit 1
-fi
-
-# Create Samba user
-if ! sudo useradd -M -s /sbin/nologin "${SMB_USER}"; then
-    echo "Error: Failed to create Samba user. Please check if the user already exists."
-    exit 1
-fi
-
-# Add user to group
-if ! sudo usermod -aG "${SMB_GROUP}" "${SMB_USER}"; then
-    echo "Error: Failed to add user to group."
-    exit 1
-fi
-
-# Add password to user
-if ! sudo smbpasswd -a "${SMB_USER}"; then
-    echo "Error: Failed to add password to user."
-    exit 1
-fi
-
-# Activate user
-if ! sudo smbpasswd -e "${SMB_USER}"; then
-    echo "Error: Failed to enable user."
-    exit 1
-fi
-
-
-                                    # sudo sed -i "s:SMB_GROUP_HERE:$SMB_GROUP:g" /etc/samba/smb.conf
-
-
-# Modify /etc/samba/smb.conf
-if ! sudo sed -i "s:SMB_GROUP_HERE:$SMB_GROUP:g" /etc/samba/smb.conf; then
-    echo "Error: Failed to update Samba configuration."
-    exit 1
-fi
-
-# Check if the placeholder was replaced 
-if grep -q "SMB_GROUP_HERE" /etc/samba/smb.conf; then
-    echo "Error: Placeholder was not replaced. Please check your smb.conf file."
-    exit 1
-else
-    echo "Samba configuration updated. You may need to restart the Samba service (e.g., sudo service smbd restart)."
-fi
+#SMB_GROUP=""
+#SMB_USER=""
 
 # Create directories
 if ! sudo mkdir -p /public || ! sudo mkdir -p /private; then
@@ -347,6 +279,78 @@ if ! sudo chmod 2775 /public; then
     exit 1
 fi
 
+echo "Directories /public and /private are configured with the correct permissions"
+
+# Get valid Samba user name with error correction, existing user check, and repetition
+while true; do
+    read -p "Enter the Samba user name: " SMB_USER
+
+    # Input validation
+    if [[ -z "${SMB_USER}" ]]; then  # Check if input is empty
+        echo "Input cannot be empty. Please try again."
+    elif [[ ! "${SMB_USER}" =~ ^[a-zA-Z0-9]+$ ]]; then # Basic sanitization
+        echo "Group name can only contain letters, numbers. Please try again."
+    else
+        # Get existing user names for validation
+        existing_users=$(sudo getent group | awk -F: '{print $1}' | paste -sd, -)
+
+        if [[ ",$existing_users," =~ ",$SMB_USER," ]]; then  # Check against existing users
+            echo "User name already exists. Please choose a different name."
+        else
+            # User name is valid, proceed with the rest of your actions
+            echo "$SMB_USER" > "smb-user-name.txt" 
+            break # Exit the loop since we have a valid group name
+        fi
+    fi
+done
+
+# Create Samba user
+if ! sudo useradd -M -s /sbin/nologin "${SMB_USER}"; then
+    echo "Error: Failed to create Samba user. Please check if the user already exists."
+    exit 1
+fi
+
+# Add password to user
+if ! sudo smbpasswd -a "${SMB_USER}"; then
+    echo "Error: Failed to add password to user."
+    exit 1
+fi
+
+# Activate user
+if ! sudo smbpasswd -e "${SMB_USER}"; then
+    echo "Error: Failed to enable user."
+    exit 1
+fi
+
+# Get valid Samba group name with error correction, existing group check, and repetition
+while true; do
+    read -p "Enter the Samba group name: " SMB_GROUP
+
+    # Input validation
+    if [[ -z "${SMB_GROUP}" ]]; then  # Check if input is empty
+        echo "Input cannot be empty. Please try again."
+    elif [[ ! "${SMB_GROUP}" =~ ^[a-zA-Z0-9]+$ ]]; then # Basic sanitization
+        echo "Group name can only contain letters, numbers, underscores, and hyphens. Please try again."
+    else
+        # Get existing group names for validation
+        existing_groups=$(sudo getent group | awk -F: '{print $1}' | paste -sd, -)
+
+        if [[ ",$existing_groups," =~ ",$SMB_GROUP," ]]; then  # Check against existing groups
+            echo "Group name already exists. Please choose a different name."
+        else
+            # Group name is valid, proceed with the rest of your actions
+            echo "$SMB_GROUP" > "smb-group-name.txt" 
+            break # Exit the loop since we have a valid group name
+        fi
+    fi
+done
+
+# Create Samba group
+if ! sudo groupadd "${SMB_GROUP}"; then
+    echo "Error: Failed to create Samba group. Please check if the group already exists."
+    exit 1
+fi
+
 # Change group ownership
 if ! sudo chgrp -R "${SMB_GROUP}" /private; then
     echo "Error: Failed to change group ownership of /private."
@@ -358,7 +362,40 @@ if ! sudo chgrp -R "${SMB_GROUP}" /public; then
     exit 1
 fi
 
-echo "Directories /public and /private are configured with the correct permissions and ownership."
+echo "Directories /public and /private are configured with the correct ownership."
+
+# Add user to group
+if ! sudo usermod -aG "${SMB_GROUP}" "${SMB_USER}"; then
+    echo "Error: Failed to add user to group."
+    exit 1
+fi
+
+# Modify smb.conf with fallback to smb-group-name.txt
+if ! sudo sed -i "s:SMB_GROUP_HERE:$SMB_GROUP:g" smb.conf; then
+    # Initial replacement failed, check if smb-group-name.txt exists
+    if [ -f "smb-group-name.txt" ]; then
+        fallback_group=$(head -n 1 smb-group-name.txt)  # Read the first line
+
+        # Attempt replacement with group name from the file
+        if sudo sed -i "s:SMB_GROUP_HERE:$fallback_group:g" smb.conf; then
+            echo "Placeholder replaced with group name from smb-group-name.txt"
+        else
+            echo "Error: Failed to update Samba configuration even with fallback."
+            exit 1
+        fi
+    else
+        echo "Error: Failed to update Samba configuration and smb-group-name.txt not found."
+        exit 1
+    fi
+fi
+
+# Check if the placeholder was replaced even after potential fallback
+if grep -q "SMB_GROUP_HERE" smb.conf; then
+    echo "Error: Placeholder was not replaced. Please check your smb.conf file."
+    exit 1
+else
+    echo "Samba configuration updated. You may need to restart the Samba service (e.g., sudo service smbd restart)."
+fi
 
 
 ##############################
