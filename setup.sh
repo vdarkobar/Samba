@@ -163,9 +163,9 @@ else
         echo -e "${RED}Could not determine the host IP address or hostname. Skipping /etc/hosts update${NC}"
     else
         # Display the extracted domain name, host IP, and hostname
-        echo -e "${GREEN}Domain name: $DOMAIN_NAME${NC}"
-        echo -e "${GREEN}Host IP: $HOST_IP${NC}"
-        echo -e "${GREEN}Hostname: $HOST_NAME${NC}"
+        echo -e "${GREEN}Hostname:${NC} $HOST_NAME"
+        echo -e "${GREEN}Domain name:${NC} $DOMAIN_NAME"
+        echo -e "${GREEN}Host IP:${NC} $HOST_IP"
 
         # Remove any existing lines with the current hostname in /etc/hosts
         sudo sed -i "/$HOST_NAME/d" /etc/hosts
@@ -187,7 +187,7 @@ fi
 # Modify dhclient.conf file #
 #############################
 echo
-echo -e "${GREEN}Preventing dhclient from overwriting${NC} resolve.conf"
+echo -e "${GREEN}Preventing${NC} dhclient ${GREEN}from overwriting${NC} resolve.conf"
 
 sleep 0.5 # delay for 0.5 seconds
 echo
@@ -407,7 +407,7 @@ echo
 ##############################
 # Replace configuration file #
 ##############################
-echo -e "${GREEN}Replacing existing Samba configuration file ${NC} (smb.conf)"
+echo -e "${GREEN}Replacing existing Samba configuration file${NC} smb.conf"
 
 sleep 0.5 # delay for 0.5 seconds
 echo
@@ -436,6 +436,7 @@ echo -e "${GREEN}Username to access private Samba share:${NC} $SMB_USER"
 echo
 echo -e "${GREEN}To list what Samba services are available on the server:${NC}"
 echo -e "smbclient -L //$IP_ADDRESS/ -U $SMB_USER"
+echo -e "smbclient -L //$HOST_NAME.$DOMAIN_NAME/ -U $SMB_USER"
 echo
 echo -e "${GREEN}Test access to the share at: ${NC}"
 echo
