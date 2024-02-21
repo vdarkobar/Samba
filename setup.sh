@@ -87,18 +87,18 @@ echo
 # Backup the existing /etc/hosts file
 if [ ! -f /etc/hosts.backup ]; then
     sudo cp /etc/hosts /etc/hosts.backup
-    echo -e "${GREEN}Backup of /etc/hosts created.${NC}"
+    echo -e "${GREEN}Backup of${NC} /etc/hosts ${GREEN}created.${NC}"
 else
-    echo -e "${YELLOW}Backup of /etc/hosts already exists. Skipping backup.${NC}"
+    echo -e "${YELLOW}Backup of${NC} /etc/hosts ${YELLOW}already exists. Skipping backup.${NC}"
 fi
 
 # Backup original /etc/cloud/cloud.cfg file before modifications
 CLOUD_CFG="/etc/cloud/cloud.cfg"
 if [ ! -f "$CLOUD_CFG.bak" ]; then
     sudo cp "$CLOUD_CFG" "$CLOUD_CFG.bak"
-    echo -e "${GREEN}Backup of $CLOUD_CFG created.${NC}"
+    echo -e "${GREEN}Backup of${NC} $CLOUD_CFG ${GREEN}created.${NC}"
 else
-    echo -e "${YELLOW}Backup of $CLOUD_CFG already exists. Skipping backup.${NC}"
+    echo -e "${YELLOW}Backup of${NC} $CLOUD_CFG ${YELLOW}already exists. Skipping backup.${NC}"
 fi
 
 # Before modifying Unbound configuration files, create backups if they don't already exist
@@ -110,9 +110,9 @@ SAMBA_FILES=(
 for file in "${SAMBA_FILES[@]}"; do
     if [ ! -f "$file.backup" ]; then
         sudo cp "$file" "$file.backup"
-        echo -e "${GREEN}Backup of $file created.${NC}"
+        echo -e "${GREEN}Backup of${NC} $file ${GREEN}created.${NC}"
     else
-        echo -e "${YELLOW}Backup of $file already exists. Skipping backup.${NC}"
+        echo -e "${YELLOW}Backup of${NC} $file ${YELLOW}already exists. Skipping backup.${NC}"
     fi
 done
 
@@ -134,7 +134,7 @@ sudo sed -i '/^\s*- set_hostname/ s/^/#/' "$FILE_PATH"
 sudo sed -i '/^\s*- update_hostname/ s/^/#/' "$FILE_PATH"
 sudo sed -i '/^\s*- update_etc_hosts/ s/^/#/' "$FILE_PATH"
 
-echo -e "${GREEN}Modifications to $FILE_PATH applied successfully.${NC}"
+echo -e "${GREEN}Modifications to${NC} $FILE_PATH ${GREEN}applied successfully.${NC}"
 
 
 ######################
@@ -176,7 +176,7 @@ else
         # Insert the new line directly below the 127.0.0.1 localhost line
         sudo awk -v newline="$NEW_LINE" '/^127.0.0.1 localhost$/ { print; print newline; next }1' /etc/hosts | sudo tee /etc/hosts.tmp > /dev/null && sudo mv /etc/hosts.tmp /etc/hosts
         echo
-        echo -e "${GREEN}File /etc/hosts has been updated.${NC}"
+        echo -e "${GREEN}File${NC} /etc/hosts ${GREEN}has been updated.${NC}"
     fi
 
     # Continue with any other operations that require DOMAIN_NAME
@@ -187,7 +187,7 @@ fi
 # Modify dhclient.conf file #
 #############################
 echo
-echo -e "${GREEN}Modifying dhclient.conf file (automaticaly overwriting resolve.conf) ${NC}"
+echo -e "${GREEN}Preventing dhclient from overwriting${NC} resolve.conf"
 
 sleep 0.5 # delay for 0.5 seconds
 echo
@@ -440,16 +440,16 @@ echo
 echo -e "${GREEN}Test access to the share at: ${NC}"
 echo
 echo -e "${GREEN}Linux: ${NC}"
-echo -e "smbclient '\\localhost\private' -U $SMB_USER"
-echo -e "smbclient '\\localhost\public' -U $SMB_USER"
-echo -e "smbclient '\\$IP_ADDRESS\private' -U $SMB_USER"
-echo -e "smbclient '\\$IP_ADDRESS\public' -U $SMB_USER"
-echo -e "smbclient '\\$HOST_NAME.$DOMAIN_NAME\private' -U $SMB_USER"
-echo -e "smbclient '\\$HOST_NAME.$DOMAIN_NAME\public' -U $SMB_USER"
+echo "smbclient '\\\\localhost\\private' -U $SMB_USER"
+echo "smbclient '\\\\localhost\\public' -U $SMB_USER"
+echo "smbclient '\\\\$IP_ADDRESS\\private' -U $SMB_USER"
+echo "smbclient '\\\\$IP_ADDRESS\\public' -U $SMB_USER"
+echo "smbclient '\\\\$HOST_NAME.$DOMAIN_NAME\\private' -U $SMB_USER"
+echo "smbclient '\\\\$HOST_NAME.$DOMAIN_NAME\\public' -U $SMB_USER"
 echo
 echo -e "${GREEN}on Windows: ${NC}"
-echo -e "\\$IP_ADDRESS"
-echo -e "\\$HOST_NAME.$DOMAIN_NAME"
+echo "\\\\$IP_ADDRESS"
+echo "\\\\$HOST_NAME.$DOMAIN_NAME"
 echo
 
 
