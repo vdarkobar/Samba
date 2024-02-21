@@ -398,7 +398,7 @@ if grep -q "SMB_GROUP_HERE" smb.conf; then
     echo -e "${RED}Error: Placeholder was not replaced. Please check your smb.conf file. ${NC}"
     exit 1
 else
-    echo -e "${GREEN}Samba configuration updated. You may need to restart the Samba service. ${NC}"
+    echo -e "${GREEN}Samba configuration updated. ${NC}"
 fi
 
 echo
