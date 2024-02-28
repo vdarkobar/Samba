@@ -43,6 +43,7 @@ while true; do
     if [[ "$choice" == [yY] ]]; then
 
         # Confirming the start of the script
+        echo
         echo -e "${GREEN}Starting... ${NC}"
         sleep 0.5 # delay for 0.5 second
         echo
