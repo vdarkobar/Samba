@@ -358,6 +358,8 @@ fi
 ######################
 # Info before reboot #
 ######################
+IP_ADDRESS=$(hostname -I | awk '{print $1}')
+
 echo -e "${GREEN}REMEMBER: ${NC}"
 sleep 0.5 # delay for 0.5 seconds
 echo
