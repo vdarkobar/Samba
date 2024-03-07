@@ -23,8 +23,6 @@ chmod +x setup.sh && \
 rm README.md && \
 rm steps.md && \
 ./setup.sh
-```
-
-
+```  
 <br><br>
 *(steps used to configure <a href="https://github.com/vdarkobar/Samba/blob/main/steps.md">Samba</a>)*
