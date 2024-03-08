@@ -1,5 +1,5 @@
 <p align="left">
-  <a href="https://github.com/vdarkobar/Home-Cloud?tab=readme-ov-file#samba-file-server">Home</a>
+  <a href="https://github.com/vdarkobar/Home-Cloud/blob/main/README.md#create-samba-file-server">Home</a>
 </p>  
 
   
