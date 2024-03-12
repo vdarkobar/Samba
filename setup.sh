@@ -380,7 +380,7 @@ domain_name=$(awk -F' ' '/^domain/ {print $2; exit}' /etc/resolv.conf)
 host_ip=$(hostname -I | awk '{print $1}')
 host_name=$(hostname)
 # Construct the new line for /etc/hosts
-new_line="$host_ip $host_name $host_name.$domain_name"
+new_line="$host_name.$domain_name"
 
 echo -e "${GREEN} REMEMBER: ${NC}"
 sleep 0.5 # delay for 0.5 seconds
@@ -395,7 +395,7 @@ echo -e "${GREEN} Username to access private Samba share:${NC} $SMB_USER"
 echo
 echo -e "${GREEN} To list what Samba services are available on the server:${NC}"
 echo -e "smbclient -L //$IP_ADDRESS/ -U $SMB_USER"
-echo -e "smbclient -L //$HOST_NAME.$DOMAIN_NAME/ -U $SMB_USER"
+echo -e "smbclient -L //$new_line/ -U $SMB_USER"
 echo
 echo -e "${GREEN} Test access to the share at: ${NC}"
 echo
@@ -404,8 +404,8 @@ echo "smbclient '\\\\localhost\\private' -U $SMB_USER"
 echo "smbclient '\\\\localhost\\public' -U $SMB_USER"
 echo "smbclient '\\\\$IP_ADDRESS\\private' -U $SMB_USER"
 echo "smbclient '\\\\$IP_ADDRESS\\public' -U $SMB_USER"
-echo "smbclient '\\\\$HOST_NAME.$DOMAIN_NAME\\private' -U $SMB_USER"
-echo "smbclient '\\\\$HOST_NAME.$DOMAIN_NAME\\public' -U $SMB_USER"
+echo "smbclient '\\\\$new_line\\private' -U $SMB_USER"
+echo "smbclient '\\\\$new_line\\public' -U $SMB_USER"
 echo
 echo -e "${GREEN} on Windows: ${NC}"
 echo "\\\\$IP_ADDRESS"
