@@ -374,6 +374,14 @@ fi
 
 IP_ADDRESS=$(hostname -I | awk '{print $1}')
 
+# Extract the domain name from /etc/resolv.conf
+domain_name=$(awk -F' ' '/^domain/ {print $2; exit}' /etc/resolv.conf)
+# Get the host's IP address and hostname
+host_ip=$(hostname -I | awk '{print $1}')
+host_name=$(hostname)
+# Construct the new line for /etc/hosts
+new_line="$host_ip $host_name $host_name.$domain_name"
+
 echo -e "${GREEN} REMEMBER: ${NC}"
 sleep 0.5 # delay for 0.5 seconds
 echo
