@@ -382,13 +382,16 @@ host_name=$(hostname)
 # Construct the new line for /etc/hosts
 new_line="$host_name.$domain_name"
 
+num_lines=$(tput lines)
+echo -e "\033[${num_lines}A\033[0J"
+
 echo -e "${GREEN} REMEMBER: ${NC}"
 sleep 0.5 # delay for 0.5 seconds
 echo
 
 echo -e "${GREEN} This configuration creates two shared folders: ${NC}"
 echo -e 
-echo -e " /public - ${GREEN}for Limited Guest Access (Read only) ${NC}"
+echo -e " /public  - ${GREEN} for Limited Guest Access (Read only) ${NC}"
 echo -e " /private - ${GREEN} owned by Samba group:${NC} $SMB_GROUP ${GREEN}with the following member:${NC} $SMB_USER"
 echo
 echo -e "${GREEN} Username to access private Samba share:${NC} $SMB_USER"
@@ -397,7 +400,7 @@ echo -e "${GREEN} To list what Samba services are available on the server:${NC}"
 echo -e "smbclient -L //$IP_ADDRESS/ -U $SMB_USER"
 echo -e "smbclient -L //$new_line/ -U $SMB_USER"
 echo
-echo -e "${GREEN} Test access to the share at: ${NC}"
+echo -e "${GREEN} Access to shares: ${NC}"
 echo
 echo -e "${GREEN} Linux: ${NC}"
 echo "smbclient '\\\\localhost\\private' -U $SMB_USER"
@@ -409,7 +412,7 @@ echo "smbclient '\\\\$new_line\\public' -U $SMB_USER"
 echo
 echo -e "${GREEN} on Windows: ${NC}"
 echo "\\\\$IP_ADDRESS"
-echo "\\\\$HOST_NAME.$DOMAIN_NAME"
+echo "\\\\$new_line"
 echo
 
 
