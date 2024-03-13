@@ -2,8 +2,6 @@
 
 clear
 
-WORK_DIR=$(pwd)
-
 ##############################################################
 # Define ANSI escape sequence for green, red and yellow font #
 ##############################################################
@@ -18,6 +16,48 @@ YELLOW='\033[0;33m'
 ########################################################
 
 NC='\033[0m'
+
+
+################################
+# Setting up working directory #
+################################
+
+# Loop until a non-empty directory name is entered
+while true; do
+    echo
+    echo -e "${GREEN} Enter working directory name for script: ${NC}"
+    echo
+    read -r NAME
+
+    # Check if the input is empty
+    if [ -z "$NAME" ]; then
+        echo
+        echo -e "${RED} Error: Directory name cannot be empty. Please try again.${NC}"
+        continue
+    fi
+
+    # Create the directory and change to it
+    mkdir -p "$NAME" 2>/dev/null
+    if [ $? -ne 0 ]; then
+        echo
+        echo -e "${RED} Error: Failed to create directory $NAME. Please try again.${NC}"
+        continue
+    fi
+
+    cd "$NAME" && break
+    echo
+    echo -e "${RED} Error: Failed to change directory to $NAME. Please try again.${NC}"
+done
+
+# Set the WORK_DIR variable
+WORK_DIR=$(pwd)
+
+# Scrol to top
+num_lines=$(tput lines)
+echo -e "\033[${num_lines}A\033[0J"
+
+echo
+echo -e "${GREEN} Working directory:${NC} $WORK_DIR"
 
 
 #################
@@ -71,6 +111,91 @@ while true; do
     fi
 done
 
+
+########################
+# Create smb.conf file #
+########################
+
+# Define the path to the directory and the file
+file_path="$WORK_DIR/smb.conf"
+
+# Check if the WORK_DIR variable is set
+if [ -z "$WORK_DIR" ]; then
+    echo -e "${RED} Error: WORK_DIR variable is not set${NC}"
+    exit 1
+fi
+
+# Create or overwrite the smb.conf file, using sudo for permissions
+echo -e "${GREEN} Creating Samba configuration file...:${NC} $file_path"
+echo
+sudo tee "$file_path" > /dev/null <<EOF || { echo "Error: Failed to create $file_path"; exit 1; }
+# Global parameters
+[global]
+workgroup = WORKGROUP
+server string = Samba Server
+server role = standalone server
+# Consistent logging - consider a higher max log size (%m.log)
+log file = /var/log/samba/log.%m
+max log size = 5000
+logging = file
+panic action = /usr/share/samba/panic-action %d
+obey pam restrictions = Yes
+pam password change = Yes
+unix password sync = Yes
+passwd program = /usr/bin/passwd %u
+passwd chat = *Enter\\snew\\s*\\spassword:* %n\\n *Retype\\snew\\s*\\spassword:* %n\\n *password\\supdated\\ssuccessfully* .
+map to guest = Bad User
+# Security Enhancements
+smb encrypt = mandatory
+client min protocol = SMB3
+server min protocol = SMB3
+idmap config * : backend = tdb
+usershare allow guests = No
+guest account = nobody
+invalid users = root
+# VFS Audit logging (adjust paths/settings as needed)
+vfs objects = full_audit
+full_audit:prefix = %u|%I|%m|%S
+full_audit:success = mkdir rmdir open read write
+full_audit:failure = none
+full_audit:priority = NOTICE
+# Recycle Bin Configuration
+vfs objects = recycle
+recycle:touch = yes
+recycle:keeptree = yes
+recycle:versions = yes
+recycle:exclude_dir = tmp quarantine
+# Share Definitions
+[public]
+comment = Public Folder for Limited Guest Access
+path = /public
+browseable = Yes
+writable = No
+guest ok = Yes
+[private]
+comment = Private Folder
+path = /private
+# Valid user, in this case, is a group smbshare, add users to group to allow access
+valid users = @SMB_GROUP_HERE
+guest ok = No
+writable = Yes
+read only = No
+# Security
+force create mode = 0770
+force directory mode = 0770
+inherit permissions = Yes
+EOF
+
+# Check if the file was created successfully
+if [ $? -ne 0 ]; then
+    echo
+    echo -e "${RED} Error: Failed to create${NC} $file_path"
+    exit 1
+fi
+
+echo
+echo -e "${GREEN} Samba configuration file created successfully:${NC} $file_path"
+echo
 
 #################
 # Install Samba #
