@@ -25,7 +25,7 @@ NC='\033[0m'
 # Loop until a non-empty directory name is entered
 while true; do
     echo
-    echo -e "${GREEN} Enter working directory name for script: ${NC}"
+    echo -e "${GREEN} Enter Working directory name: ${NC}"
     echo
     read -r NAME
 
@@ -554,14 +554,3 @@ while true; do
         *) echo -e "${YELLOW} Invalid response. Please answer${NC} yes or no."; echo ;;
     esac
 done
-
-
-####################################
-# Remove Script(s) from the system #
-####################################
-
-echo
-echo -e "${RED} This Script Will Self Destruct!${NC}"
-echo
-cd ~
-sudo rm -rf $WORK_DIR
