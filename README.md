@@ -15,14 +15,7 @@ Don't forget to add free space to cloned VM:
   
 ### *Run this command*:
 ```
-clear
-sudo apt -y install git && \
-RED='\033[0;31m'; NC='\033[0m'; echo -ne "${RED}Enter directory name: ${NC}"; read NAME; mkdir -p "$NAME"; \
-cd "$NAME" && git clone https://github.com/vdarkobar/Samba.git . && \
-chmod +x setup.sh && \
-rm README.md && \
-rm steps.md && \
-./setup.sh
+bash -c "$(wget -qLO - https://raw.githubusercontent.com/vdarkobar/Samba/main/setup.sh)"
 ```
 <br><br>
 *(steps used to configure <a href="https://github.com/vdarkobar/Samba/blob/main/steps.md">Samba</a>)*
