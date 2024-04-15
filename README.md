@@ -11,7 +11,8 @@ Clone <a href="https://github.com/vdarkobar/DebianTemplate/blob/main/README.md#d
 
   
 Don't forget to add free space to cloned VM:  
-> *VM Name > Hardware > Hard Disk > Disk Action > Resize*  
+> *VM > Hardware > Hard Disk > Disk Action > Resize*
+> *CT > Resources > Root Disk > Volume Action > Resize*  
   
 ### *Run on VM*:
 ```
