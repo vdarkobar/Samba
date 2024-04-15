@@ -13,11 +13,11 @@ Clone <a href="https://github.com/vdarkobar/DebianTemplate/blob/main/README.md#d
 Don't forget to add free space to cloned VM:  
 > *VM Name > Hardware > Hard Disk > Disk Action > Resize*  
   
-### *Run this command*:
+### *Run on VM*:
 ```
 bash -c "$(wget -qLO - https://raw.githubusercontent.com/vdarkobar/Samba/main/setup.sh)"
 ```
-
+### *Run on CT*:
 ```
 bash -c "$(wget -qLO - https://raw.githubusercontent.com/vdarkobar/Samba/main/setup-ct.sh)"
 ```
