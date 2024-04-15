@@ -17,5 +17,9 @@ Don't forget to add free space to cloned VM:
 ```
 bash -c "$(wget -qLO - https://raw.githubusercontent.com/vdarkobar/Samba/main/setup.sh)"
 ```
+
+```
+bash -c "$(wget -qLO - https://raw.githubusercontent.com/vdarkobar/Samba/main/setup-ct.sh)"
+```
 <br><br>
 *(steps used to configure <a href="https://github.com/vdarkobar/Samba/blob/main/steps.md">Samba</a>)*
