@@ -31,7 +31,7 @@ sleep 0.5 # delay for 0.5 seconds
 echo
 
 echo -e "${GREEN} You'll be asked to enter: ${NC}"
-echo -e " - Samba User name and Password ${NC}"
+echo -e " - Samba User name / Password ${NC}"
 echo -e " - Samba Group ${NC}"
 echo -e "${GREEN}   to determin ownership for the${NC} shares."
 echo
@@ -200,7 +200,6 @@ echo
 # Create backup files #
 #######################
 
-echo
 echo -e "${GREEN} Creating backup files ${NC}"
 
 sleep 0.5 # delay for 0.5 seconds
