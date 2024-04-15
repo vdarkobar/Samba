@@ -25,7 +25,7 @@ NC='\033[0m'
 echo
 echo -e "${GREEN} This script will install and configure${NC} Samba File Server"
 echo
-echo -e "${GREEN} Be sure that you are logged in as a${NC} non-root user ${GREEN}and that user is added to the${NC} sudo ${GREEN}group"${NC}
+echo -e "${GREEN} Be sure that you are logged in as a${NC} non-root ${GREEN}user and that user is added to the${NC} sudo ${GREEN}group"${NC}
 
 sleep 0.5 # delay for 0.5 seconds
 echo
@@ -107,6 +107,7 @@ echo -e "\033[${num_lines}A\033[0J"
 
 echo
 echo -e "${GREEN} Working directory:${NC} $WORK_DIR"
+echo
 
 
 ########################
@@ -124,7 +125,7 @@ fi
 
 # Create or overwrite the smb.conf file, using sudo for permissions
 echo -e "${GREEN} Creating Samba configuration file...:${NC} $file_path"
-echo
+
 sudo tee "$file_path" > /dev/null <<EOF || { echo "Error: Failed to create $file_path"; exit 1; }
 # Global parameters
 [global]
