@@ -18,27 +18,14 @@ YELLOW='\033[0;33m'
 NC='\033[0m'
 
 
-################################
-# Setting up working directory #
-################################
-
-# Set the WORK_DIR variable
-WORK_DIR=$(mktemp -d)
-
-# Scrol to top
-num_lines=$(tput lines)
-echo -e "\033[${num_lines}A\033[0J"
-
-echo
-echo -e "${GREEN} Working directory:${NC} $WORK_DIR"
-
-
 #################
 # Intro message #
 #################
 
 echo
 echo -e "${GREEN} This script will install and configure${NC} Samba File Server"
+echo
+echo -e "${GREEN} Be sure that you are logged in as a${NC} non-root user ${GREEN}and that user is added to the${NC} sudo ${GREEN}group"${NC}
 
 sleep 0.5 # delay for 0.5 seconds
 echo
@@ -83,6 +70,43 @@ while true; do
         echo
     fi
 done
+
+
+####################
+# Install Packages #
+####################
+
+echo -e "${GREEN} Installing Samba and other packages ${NC}"
+
+sleep 0.5 # delay for 0.5 seconds
+echo
+
+# Update the package repositories
+if ! sudo apt update; then
+    echo -e "${RED}Failed to update package repositories. Exiting.${NC}"
+    exit 1
+fi
+
+# Install the necessary packages
+if ! sudo apt install -y samba smbclient cifs-utils ufw; then
+    echo -e "${RED}Failed to install packages. Exiting.${NC}"
+    exit 1
+fi
+
+
+################################
+# Setting up working directory #
+################################
+
+# Set the WORK_DIR variable
+WORK_DIR=$(mktemp -d)
+
+# Scrol to top
+num_lines=$(tput lines)
+echo -e "\033[${num_lines}A\033[0J"
+
+echo
+echo -e "${GREEN} Working directory:${NC} $WORK_DIR"
 
 
 ########################
@@ -169,28 +193,6 @@ fi
 echo
 echo -e "${GREEN} Samba configuration file created successfully:${NC} $file_path"
 echo
-
-
-#################
-# Install Samba #
-#################
-
-echo -e "${GREEN} Installing Samba and other packages ${NC}"
-
-sleep 0.5 # delay for 0.5 seconds
-echo
-
-# Update the package repositories
-if ! sudo apt update; then
-    echo -e "${RED}Failed to update package repositories. Exiting.${NC}"
-    exit 1
-fi
-
-# Install the necessary packages
-if ! sudo apt install -y samba smbclient cifs-utils ufw sudo; then
-    echo -e "${RED}Failed to install packages. Exiting.${NC}"
-    exit 1
-fi
 
 
 #######################
