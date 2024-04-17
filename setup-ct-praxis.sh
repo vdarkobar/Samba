@@ -255,6 +255,7 @@ new_line="$host_ip $host_name $host_name.$domain_name"
 sudo mv /tmp/hosts.tmp /etc/hosts
 
 echo -e "${GREEN} File${NC} /etc/hosts ${GREEN}has been updated ${NC}"
+echo
 
 
 ##################
@@ -305,23 +306,18 @@ echo
 ######################################
 
 # Create directories
-if ! sudo mkdir -p /public || ! sudo mkdir -p /private; then
-    echo -e "${RED} Error: Failed to create directories. ${NC}"
+if ! sudo mkdir -p /praxis; then
+    echo -e "${RED} Error: Failed to create directory. ${NC}"
     exit 1
 fi
 
 # Set permissions
-if ! sudo chmod 2770 /private; then
-    echo -e "${RED} Error: Failed to set permissions on${NC} /private"
+if ! sudo chmod 2770 /praxis; then
+    echo -e "${RED} Error: Failed to set permissions on${NC} /praxis"
     exit 1
 fi
 
-if ! sudo chmod 2775 /public; then
-    echo -e "${RED} Error: Failed to set permissions on${NC} /public"
-    exit 1
-fi
-
-echo -e "${GREEN} Directories${NC} /public ${GREEN}and${NC} /private${NC} ${GREEN}are configured with the correct permissions${NC}"
+echo -e "${GREEN} Directory${NC} /praxis ${GREEN} configured with the correct permissions${NC}"
 echo
 
 # Get valid Samba user name with error correction, existing user check, and repetition
@@ -395,18 +391,13 @@ if ! sudo groupadd "${SMB_GROUP}"; then
 fi
 
 # Change group ownership
-if ! sudo chgrp -R "${SMB_GROUP}" /private; then
-    echo -e "${RED} Error: Failed to change group ownership of${NC} /private"
-    exit 1
-fi
-
-if ! sudo chgrp -R "${SMB_GROUP}" /public; then
-    echo -e "${RED} Error: Failed to change group ownership of${NC} /public "
+if ! sudo chgrp -R "${SMB_GROUP}" /praxis; then
+    echo -e "${RED} Error: Failed to change group ownership of${NC} /praxis"
     exit 1
 fi
 
 echo
-echo -e "${GREEN} Directories${NC} /public ${GREEN}and${NC} /private ${GREEN}are configured with the correct ownership.${NC}"
+echo -e "${GREEN} Directorys${NC} /praxis ${GREEN}configured with the correct ownership.${NC}"
 echo
 
 # Add user to group
