@@ -447,6 +447,7 @@ echo "$public_key" | sudo tee -a "$auth_keys" > /dev/null || { echo -e "${RED} E
 
 echo
 echo -e "${GREEN} Public key added successfully.${NC}"
+sleep 0.5 # delay for 0.5 seconds
 echo
 
 
