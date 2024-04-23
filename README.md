@@ -3,8 +3,7 @@
 </p>  
 
   
-# Samba
-File server  
+# Samba file server  
   
 Don't forget to add free space to cloned VM:  
 > *VM > Hardware > Hard Disk > Disk Action > Resize*
