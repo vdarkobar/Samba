@@ -232,6 +232,7 @@ done
 # Prepare hosts file #
 ######################
 
+echo
 echo -e "${GREEN} Setting up hosts file ${NC}"
 
 sleep 0.5 # delay for 0.5 seconds
@@ -467,6 +468,7 @@ fi
 
 # Ask the user for the public key
 while true; do
+    echo
     echo -e "${YELLOW} Please enter your public SSH key:${NC}"
     echo
     read public_key
