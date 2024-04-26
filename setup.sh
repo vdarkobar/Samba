@@ -134,8 +134,29 @@ if ! sudo apt update; then
     exit 1
 fi
 
-# Install the necessary packages
-if ! sudo apt install -y samba smbclient cifs-utils ufw fail2ban unattended-upgrades; then
+# Template packages
+if ! sudo apt install -y \
+    ufw \
+    wget \
+    curl \
+    gnupg2 \
+    argon2 \
+    fail2ban \
+    lsb-release \
+    gnupg-agent \
+    libpam-tmpdir \
+    bash-completion \
+    ca-certificates \
+    qemu-guest-agent \
+    unattended-upgrades \
+    cloud-initramfs-growroot \
+    software-properties-common; then
+    echo -e "${RED} Failed to install packages. Exiting.${NC}"
+    exit 1
+fi
+
+# # Application packages
+if ! sudo apt install -y samba smbclient cifs-utils; then
     echo -e "${RED}Failed to install packages. Exiting.${NC}"
     exit 1
 fi
